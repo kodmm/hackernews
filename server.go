@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/kodmm/hackernews/graph"
 	"github.com/kodmm/hackernews/graph/generated"
+	database "github.com/kodmm/hackernews/internal/pkg/db/postgres"
 )
 
 const defaultPort = "8080"
@@ -18,6 +19,10 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	database.InitDB()
+	defer database.CloseDB()
+	database.Migrate()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 

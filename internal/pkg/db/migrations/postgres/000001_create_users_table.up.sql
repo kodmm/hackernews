@@ -1,0 +1,10 @@
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS Users(
+    ID serial,
+    Username VARCHAR (127) UNIQUE NOT NULL,
+    Password VARCHAR (127) NOT NULL,
+    PRIMARY KEY (ID)
+);
+
+COMMIT;

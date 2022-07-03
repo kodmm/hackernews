@@ -11,6 +11,8 @@ import (
 	"github.com/kodmm/hackernews/graph/generated"
 	"github.com/kodmm/hackernews/graph/model"
 	"github.com/kodmm/hackernews/internal/links"
+	"github.com/kodmm/hackernews/internal/users"
+	"github.com/kodmm/hackernews/pkg/jwt"
 )
 
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
@@ -22,15 +24,44 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) 
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	var user users.User
+	user.Username = input.Username
+	user.Password = input.Password
+	user.Create()
+	token, err := jwt.GenerationToken(user.Username)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	var user users.User
+	user.Username = input.Username
+	user.Password = input.Password
+	correct := user.Authenticate()
+
+	if !correct {
+		return "", &users.WrongUsernameOrPasswordError{}
+	}
+	token, err := jwt.GenerationToken(user.Username)
+	if err != nil {
+		return "", err
+	}
+	return token, err
 }
 
 func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	username, err := jwt.ParseToken(input.Token)
+	if err != nil {
+		return "", fmt.Errorf("access denied")
+	}
+	token, err := jwt.GenerationToken(username)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+
 }
 
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {

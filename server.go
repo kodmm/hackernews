@@ -7,8 +7,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi/v5"
 	"github.com/kodmm/hackernews/graph"
 	"github.com/kodmm/hackernews/graph/generated"
+	auth "github.com/kodmm/hackernews/internal/auth"
 	database "github.com/kodmm/hackernews/internal/pkg/db/postgres"
 )
 
@@ -19,6 +21,10 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	router := chi.NewRouter()
+
+	router.Use(auth.Middleware())
 
 	database.InitDB()
 	defer database.CloseDB()

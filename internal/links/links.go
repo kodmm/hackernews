@@ -15,13 +15,13 @@ type Link struct {
 }
 
 func (link Link) Save() int64 {
-	stmt, err := database.Db.Prepare("INSERT INTO Links(Title, Address) VALUES($1, $2) RETURNING ID")
+	stmt, err := database.Db.Prepare("INSERT INTO Links(Title, Address, UserID) VALUES($1, $2, $3) RETURNING ID")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var id int64
-	err = stmt.QueryRow(link.Title, link.Address).Scan(&id)
+	err = stmt.QueryRow(link.Title, link.Address, link.User.ID).Scan(&id)
 	if err != nil {
 		log.Fatal("Error:", err.Error())
 	}
@@ -30,7 +30,7 @@ func (link Link) Save() int64 {
 }
 
 func GetAll() []Link {
-	stmt, err := database.Db.Prepare("SELECT id, title, address FROM Links")
+	stmt, err := database.Db.Prepare("SELECT L.id, L.address, L.UserID, U.Username from Links L INNER JOIN Users U on L.UserID = U.ID")
 	if err != nil {
 		log.Fatal(err)
 	}

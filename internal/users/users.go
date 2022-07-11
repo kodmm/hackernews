@@ -58,7 +58,7 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 func GetUserIdByUsername(username string) (int, error) {
-	statement, err := database.Db.Prepare("SELECT ID FROM Users WHERE Usename = $1")
+	statement, err := database.Db.Prepare("SELECT ID FROM Users WHERE Username = $1")
 	if err != nil {
 		log.Fatal(err)
 	}
